@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Aloha Maids — End of Shift Report</title>
+<style>
+  :root{
+    --deep-blue:#1e4b8f;
+    --royal-blue:#2f6fca;
+    --sky-blue:#5fb8dd;
+    --light-blue:#eaf6fb;
+    --white:#ffffff;
+    --ink:#1c2b3a;
+    --muted:#5b7186;
+    --success:#2e9e5b;
+    --shadow: 0 10px 30px rgba(30,75,143,0.12);
+    --radius: 16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, var(--light-blue) 0%, #ffffff 45%);
+    color: var(--ink);
+    min-height:100vh;
+    padding-bottom: 60px;
+  }
+
+  header.hero{
+    position:relative;
+    text-align:center;
+    padding: 44px 20px 70px;
+    overflow:hidden;
+  }
+  .badge{
+    display:inline-block;
+    font-size:11px;
+    letter-spacing:1.5px;
+    font-weight:700;
+    color:var(--royal-blue);
+    background: rgba(95,184,221,0.15);
+    border:1px solid rgba(95,184,221,0.35);
+    padding:4px 12px;
+    border-radius:999px;
+    margin-bottom:14px;
+    text-transform:uppercase;
+  }
+  .logo-word{
+    font-size: clamp(34px, 7vw, 54px);
+    font-weight:900;
+    letter-spacing:1px;
+    line-height:1;
+    margin:0;
+  }
+  .logo-word .aloha{ color: var(--sky-blue); }
+  .logo-word .maids{ color: var(--deep-blue); }
+  .tagline{
+    margin-top:8px;
+    font-size:15px;
+    color:var(--muted);
+    font-style:italic;
+  }
+  .subtitle{
+    margin-top:18px;
+    font-size:20px;
+    font-weight:700;
+    color:var(--ink);
+  }
+  .wave{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    width:100%;
+    height:50px;
+    line-height:0;
+  }
+
+  main{
+    max-width: 760px;
+    margin: -30px auto 0;
+    padding: 0 20px;
+    position:relative;
+    z-index:2;
+  }
+
+  .card{
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 32px;
+    border: 1px solid rgba(30,75,143,0.06);
+  }
+
+  .field-row{ margin-bottom: 22px; }
+  label{
+    display:block;
+    font-size:13px;
+    font-weight:700;
+    color: var(--deep-blue);
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    margin-bottom:8px;
+  }
+  input[type="text"]{
+    width:100%;
+    padding:14px 16px;
+    font-size:16px;
+    border-radius:10px;
+    border:1.5px solid #d7e6f0;
+    background:#fbfdff;
+    color:var(--ink);
+    outline:none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  input[type="text"]:focus{
+    border-color: var(--sky-blue);
+    box-shadow: 0 0 0 3px rgba(95,184,221,0.25);
+  }
+
+  .stats-grid{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  @media (max-width:560px){
+    .stats-grid{ grid-template-columns: 1fr; }
+  }
+  .stat-field{
+    background: var(--light-blue);
+    border:1.5px solid #d7ecf5;
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .stat-field label{
+    color: var(--ink);
+    font-size:12px;
+    margin-bottom:10px;
+  }
+  .stepper{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .stepper button{
+    width:36px; height:36px;
+    border-radius:8px;
+    border:none;
+    background: var(--royal-blue);
+    color:#fff;
+    font-size:18px;
+    font-weight:700;
+    cursor:pointer;
+    flex:0 0 auto;
+    transition: background .15s ease, transform .1s ease;
+  }
+  .stepper button:active{ transform: scale(0.94); }
+  .stepper button:hover{ background: var(--deep-blue); }
+  .stepper input[type="number"]{
+    flex:1 1 auto;
+    width:100%;
+    min-width:0;
+    text-align:center;
+    font-size:18px;
+    font-weight:700;
+    color:var(--deep-blue);
+    padding:8px 6px;
+    border-radius:8px;
+    border:1.5px solid #cfe4ee;
+    background:#fff;
+    -moz-appearance: textfield;
+  }
+  .stepper input[type="number"]::-webkit-outer-spin-button,
+  .stepper input[type="number"]::-webkit-inner-spin-button{
+    -webkit-appearance:none; margin:0;
+  }
+  .stepper input[type="number"]:focus{
+    outline:none;
+    border-color: var(--sky-blue);
+    box-shadow: 0 0 0 3px rgba(95,184,221,0.25);
+  }
+
+  .submit-btn{
+    width:100%;
+    margin-top: 10px;
+    padding: 16px;
+    font-size:17px;
+    font-weight:800;
+    letter-spacing:0.3px;
+    color:#fff;
+    background: linear-gradient(135deg, var(--sky-blue), var(--royal-blue));
+    border:none;
+    border-radius: 12px;
+    cursor:pointer;
+    box-shadow: 0 8px 20px rgba(47,111,202,0.35);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .submit-btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 24px rgba(47,111,202,0.45); }
+  .submit-btn:active{ transform: translateY(0); }
+  .submit-btn:disabled{ opacity:0.6; cursor:not-allowed; transform:none; }
+
+  .error-text{
+    color:#c0392b;
+    font-size:13px;
+    font-weight:600;
+    margin-top:8px;
+    display:none;
+  }
+  .submit-error{
+    color:#c0392b;
+    font-size:13px;
+    font-weight:600;
+    margin-top:12px;
+    text-align:center;
+    display:none;
+  }
+
+  .confirm-panel{
+    display:none;
+    text-align:center;
+    padding: 40px 20px;
+  }
+  .confirm-icon{
+    width:64px;height:64px;
+    border-radius:50%;
+    background: rgba(46,158,91,0.12);
+    color: var(--success);
+    display:flex; align-items:center; justify-content:center;
+    margin: 0 auto 16px;
+    font-size:32px;
+  }
+  .confirm-title{
+    font-size:22px;
+    font-weight:800;
+    color: var(--deep-blue);
+    margin-bottom:6px;
+  }
+  .confirm-sub{
+    color: var(--muted);
+    font-size:14px;
+    margin-bottom:22px;
+  }
+  .summary-table{
+    text-align:left;
+    width:100%;
+    border-collapse:collapse;
+    margin-bottom:24px;
+    font-size:14px;
+  }
+  .summary-table td{
+    padding:8px 10px;
+    border-bottom:1px solid #eef3f7;
+  }
+  .summary-table td:first-child{ color: var(--muted); font-weight:600; }
+  .summary-table td:last-child{ text-align:right; font-weight:700; color:var(--ink); }
+
+  .action-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .btn-secondary{
+    padding: 11px 18px;
+    font-size:14px;
+    font-weight:700;
+    border-radius:10px;
+    border:1.5px solid var(--royal-blue);
+    background:#fff;
+    color: var(--royal-blue);
+    cursor:pointer;
+  }
+  .btn-secondary:hover{ background: var(--light-blue); }
+
+  footer{
+    text-align:center;
+    color: var(--muted);
+    font-size:12px;
+    margin-top: 26px;
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <span class="badge">Internal Tool</span>
+  <h1 class="logo-word"><span class="aloha">ALOHA</span> <span class="maids">MAIDS</span></h1>
+  <div class="tagline">referral agency</div>
+  <div class="subtitle">End of Shift Report</div>
+
+  <svg class="wave" viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,32 C240,60 480,0 720,20 C960,40 1200,60 1440,24 L1440,60 L0,60 Z" fill="#5fb8dd" opacity="0.35"></path>
+    <path d="M0,44 C240,20 480,60 720,40 C960,20 1200,10 1440,40 L1440,60 L0,60 Z" fill="#ffffff"></path>
+  </svg>
+</header>
+
+<main>
+  <div class="card">
+
+    <form id="eosForm">
+      <div class="field-row">
+        <label for="repName">Name</label>
+        <input type="text" id="repName" name="repName" placeholder="Your full name" autocomplete="name" required />
+        <div class="error-text" id="nameError">Please enter your name.</div>
+      </div>
+
+      <div class="stats-grid" id="statsGrid"></div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">Submit my EOS Report</button>
+      <div class="submit-error" id="submitError"></div>
+    </form>
+
+    <div class="confirm-panel" id="confirmPanel">
+      <div class="confirm-icon">✓</div>
+      <div class="confirm-title">Report Submitted</div>
+      <div class="confirm-sub" id="confirmSub"></div>
+
+      <table class="summary-table" id="summaryTable"></table>
+
+      <div class="action-row">
+        <button class="btn-secondary" id="copyBtn" type="button">Copy Summary</button>
+        <button class="btn-secondary" id="newReportBtn" type="button">Submit Another Report</button>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>Aloha Maids &middot; alohamaids.com &middot; Internal use only</footer>
+</main>
+
+<script>
+  const FIELDS = [
+    { key: "receivedCalls", label: "Received Calls" },
+    { key: "outboundCalls", label: "Outbound Calls" },
+    { key: "bookingByStaff", label: "Booking by Staff" },
+    { key: "emailQuoteSent", label: "Email Quote Sent" },
+    { key: "marketingRobo", label: "Marketing/Robo" },
+    { key: "textBrigade", label: "Text Brigade" },
+    { key: "grabbit", label: "Grabbit" },
+    { key: "newRecurring", label: "New Recurring" },
+  ];
+
+  const statsGrid = document.getElementById("statsGrid");
+  FIELDS.forEach(f => {
+    const wrap = document.createElement("div");
+    wrap.className = "stat-field";
+    wrap.innerHTML = `
+      <label for="${f.key}">${f.label}</label>
+      <div class="stepper">
+        <button type="button" data-action="dec" data-target="${f.key}" aria-label="decrease">−</button>
+        <input type="number" id="${f.key}" name="${f.key}" min="0" step="1" value="0" inputmode="numeric" />
+        <button type="button" data-action="inc" data-target="${f.key}" aria-label="increase">+</button>
+      </div>
+    `;
+    statsGrid.appendChild(wrap);
+  });
+
+  statsGrid.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-action]");
+    if (!btn) return;
+    const input = document.getElementById(btn.dataset.target);
+    let val = parseInt(input.value, 10);
+    if (isNaN(val)) val = 0;
+    if (btn.dataset.action === "inc") val += 1;
+    if (btn.dataset.action === "dec") val = Math.max(0, val - 1);
+    input.value = val;
+  });
+
+  const form = document.getElementById("eosForm");
+  const nameInput = document.getElementById("repName");
+  const nameError = document.getElementById("nameError");
+  const submitBtn = document.getElementById("submitBtn");
+  const submitError = document.getElementById("submitError");
+  const confirmPanel = document.getElementById("confirmPanel");
+  const confirmSub = document.getElementById("confirmSub");
+  const summaryTable = document.getElementById("summaryTable");
+
+  function todayStamp(){
+    const d = new Date();
+    return d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+      + " · " + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  }
+
+  let lastReport = null;
+
+  function saveToLocalHistory(report) {
+    try {
+      const log = JSON.parse(localStorage.getItem("alohaMaidsEOSLog") || "[]");
+      log.push(report);
+      localStorage.setItem("alohaMaidsEOSLog", JSON.stringify(log));
+    } catch (err) {
+      console.warn("Could not save to local history", err);
+    }
+  }
+
+  form.addEventListener("submit", async function(e){
+    e.preventDefault();
+    const name = nameInput.value.trim();
+    if (!name) {
+      nameError.style.display = "block";
+      nameInput.focus();
+      return;
+    }
+    nameError.style.display = "none";
+    submitError.style.display = "none";
+
+    const values = {};
+    FIELDS.forEach(f => {
+      values[f.key] = parseInt(document.getElementById(f.key).value, 10) || 0;
+    });
+
+    const report = {
+      name,
+      timestamp: new Date().toISOString(),
+      values
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting...";
+
+    try {
+      const resp = await fetch("/api/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(report)
+      });
+
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to submit report.");
+      }
+
+      saveToLocalHistory(report);
+      lastReport = report;
+      renderConfirmation(report);
+    } catch (err) {
+      console.error(err);
+      saveToLocalHistory(report);
+      submitError.textContent = "Could not reach the server, but your report was saved on this device. Please tell your manager or try again shortly.";
+      submitError.style.display = "block";
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit my EOS Report";
+    }
+  });
+
+  function renderConfirmation(report){
+    form.style.display = "none";
+    confirmPanel.style.display = "block";
+    confirmSub.textContent = `${report.name} · ${todayStamp()}`;
+
+    summaryTable.innerHTML = "";
+    FIELDS.forEach(f => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${f.label}</td><td>${report.values[f.key]}</td>`;
+      summaryTable.appendChild(tr);
+    });
+  }
+
+  document.getElementById("copyBtn").addEventListener("click", () => {
+    if (!lastReport) return;
+    const lines = [
+      `Aloha Maids — End of Shift Report`,
+      `Name: ${lastReport.name}`,
+      `Date: ${todayStamp()}`,
+      ...FIELDS.map(f => `${f.label}: ${lastReport.values[f.key]}`)
+    ];
+    const text = lines.join("\n");
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById("copyBtn");
+      const original = btn.textContent;
+      btn.textContent = "Copied!";
+      setTimeout(() => btn.textContent = original, 1500);
+    });
+  });
+
+  document.getElementById("newReportBtn").addEventListener("click", () => {
+    form.reset();
+    FIELDS.forEach(f => document.getElementById(f.key).value = 0);
+    nameError.style.display = "none";
+    confirmPanel.style.display = "none";
+    form.style.display = "block";
+    nameInput.focus();
+  });
+</script>
+
+</body>
+</html>

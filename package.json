@@ -1,0 +1,12 @@
+{
+  "name": "aloha-maids-eos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aloha Maids End of Shift Report — internal form that logs submissions to Google Sheets",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "googleapis": "^144.0.0"
+  }
+}
