@@ -102,7 +102,7 @@
     letter-spacing:0.6px;
     margin-bottom:8px;
   }
-  input[type="text"]{
+  input[type="text"], select{
     width:100%;
     padding:14px 16px;
     font-size:16px;
@@ -113,7 +113,18 @@
     outline:none;
     transition: border-color .15s ease, box-shadow .15s ease;
   }
-  input[type="text"]:focus{
+  select{
+    appearance:none;
+    -webkit-appearance:none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231e4b8f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+    background-repeat:no-repeat;
+    background-position: right 16px center;
+    background-size:18px;
+    padding-right:44px;
+    cursor:pointer;
+  }
+  select:invalid{ color:#8a9bab; }
+  input[type="text"]:focus, select:focus{
     border-color: var(--sky-blue);
     box-shadow: 0 0 0 3px rgba(95,184,221,0.25);
   }
@@ -301,8 +312,15 @@
     <form id="eosForm">
       <div class="field-row">
         <label for="repName">Name</label>
-        <input type="text" id="repName" name="repName" placeholder="Your full name" autocomplete="name" required />
-        <div class="error-text" id="nameError">Please enter your name.</div>
+        <select id="repName" name="repName" required>
+          <option value="" disabled selected>Select your name</option>
+          <option value="Angel Labor">Angel Labor</option>
+          <option value="Christy Soquillo">Christy Soquillo</option>
+          <option value="Liza Cohitmingao">Liza Cohitmingao</option>
+          <option value="Lovely Mariz Quirol">Lovely Mariz Quirol</option>
+          <option value="Chel Abanales">Chel Abanales</option>
+        </select>
+        <div class="error-text" id="nameError">Please select your name.</div>
       </div>
 
       <div class="stats-grid" id="statsGrid"></div>
