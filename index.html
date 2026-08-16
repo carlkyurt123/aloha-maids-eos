@@ -102,7 +102,7 @@
     letter-spacing:0.6px;
     margin-bottom:8px;
   }
-  input[type="text"], select{
+  input[type="text"], input[type="date"], select{
     width:100%;
     padding:14px 16px;
     font-size:16px;
@@ -124,7 +124,7 @@
     cursor:pointer;
   }
   select:invalid{ color:#8a9bab; }
-  input[type="text"]:focus, select:focus{
+  input[type="text"]:focus, input[type="date"]:focus, select:focus{
     border-color: var(--sky-blue);
     box-shadow: 0 0 0 3px rgba(95,184,221,0.25);
   }
@@ -211,6 +211,18 @@
   .submit-btn:active{ transform: translateY(0); }
   .submit-btn:disabled{ opacity:0.6; cursor:not-allowed; transform:none; }
 
+  .spinner{
+    display:inline-block;
+    width:16px; height:16px;
+    border:2.5px solid rgba(255,255,255,0.45);
+    border-top-color:#fff;
+    border-radius:50%;
+    vertical-align:middle;
+    margin-right:8px;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
   .error-text{
     color:#c0392b;
     font-size:13px;
@@ -232,14 +244,10 @@
     text-align:center;
     padding: 40px 20px;
   }
-  .confirm-icon{
-    width:64px;height:64px;
-    border-radius:50%;
-    background: rgba(46,158,91,0.12);
-    color: var(--success);
-    display:flex; align-items:center; justify-content:center;
-    margin: 0 auto 16px;
-    font-size:32px;
+  .thankyou-icon{
+    font-size:56px;
+    line-height:1;
+    margin-bottom:14px;
   }
   .confirm-title{
     font-size:22px;
@@ -371,6 +379,12 @@
         <div class="error-text" id="nameError">Please select your name.</div>
       </div>
 
+      <div class="field-row">
+        <label for="shiftDate">Shift Date</label>
+        <input type="date" id="shiftDate" name="shiftDate" required />
+        <div class="error-text" id="dateError">Please select the shift date.</div>
+      </div>
+
       <div class="stats-grid" id="statsGrid"></div>
 
       <button type="submit" class="submit-btn" id="submitBtn">Submit my EOS Report</button>
@@ -378,14 +392,11 @@
     </form>
 
     <div class="confirm-panel" id="confirmPanel">
-      <div class="confirm-icon">✓</div>
-      <div class="confirm-title">Report Submitted</div>
-      <div class="confirm-sub" id="confirmSub"></div>
-
-      <table class="summary-table" id="summaryTable"></table>
+      <div class="thankyou-icon">🌺</div>
+      <div class="confirm-title">Mahalo!</div>
+      <div class="confirm-sub">Thank you for your hard work and for submitting the report.</div>
 
       <div class="action-row">
-        <button class="btn-secondary" id="copyBtn" type="button">Copy Summary</button>
         <button class="btn-secondary" id="newReportBtn" type="button">Submit Another Report</button>
       </div>
     </div>
@@ -406,7 +417,9 @@
 
     <div class="modal-actions">
       <button class="btn-secondary" id="goBackBtn" type="button">Go Back</button>
-      <button class="submit-btn" id="confirmSubmitBtn" type="button">Submit</button>
+      <button class="submit-btn" id="confirmSubmitBtn" type="button">
+        <span class="spinner" id="submitSpinner" style="display:none;"></span><span id="submitBtnText">Submit</span>
+      </button>
     </div>
   </div>
 </div>
@@ -416,10 +429,12 @@
     { key: "receivedCalls", label: "Received Calls" },
     { key: "outboundCalls", label: "Outbound Calls" },
     { key: "bookingByStaff", label: "Booking by Staff" },
+    { key: "bookingOnline", label: "Booking Online" },
+    { key: "bookingByCustomer", label: "Booking by Customer" },
     { key: "emailQuoteSent", label: "Email Quote Sent" },
     { key: "marketingRobo", label: "Marketing/Robo" },
     { key: "textBrigade", label: "Text Brigade" },
-    { key: "grabbit", label: "Grabbit" },
+    { key: "quoteFormLead", label: "Quote Form Lead" },
     { key: "newRecurring", label: "New Recurring" },
   ];
 
@@ -452,9 +467,9 @@
   const form = document.getElementById("eosForm");
   const nameInput = document.getElementById("repName");
   const nameError = document.getElementById("nameError");
+  const dateInput = document.getElementById("shiftDate");
+  const dateError = document.getElementById("dateError");
   const confirmPanel = document.getElementById("confirmPanel");
-  const confirmSub = document.getElementById("confirmSub");
-  const summaryTable = document.getElementById("summaryTable");
 
   const reviewModal = document.getElementById("reviewModal");
   const reviewName = document.getElementById("reviewName");
@@ -462,14 +477,24 @@
   const modalSubmitError = document.getElementById("modalSubmitError");
   const goBackBtn = document.getElementById("goBackBtn");
   const confirmSubmitBtn = document.getElementById("confirmSubmitBtn");
+  const submitSpinner = document.getElementById("submitSpinner");
+  const submitBtnText = document.getElementById("submitBtnText");
 
-  function todayStamp(){
+  function todayISODate(){
     const d = new Date();
-    return d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-      + " · " + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
   }
 
-  let lastReport = null;
+  function formatDateDisplay(iso){
+    const [y, m, day] = iso.split("-").map(Number);
+    const dt = new Date(y, m - 1, day);
+    return dt.toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+  }
+
+  dateInput.value = todayISODate();
 
   function saveToLocalHistory(report) {
     try {
@@ -493,6 +518,14 @@
     }
     nameError.style.display = "none";
 
+    const shiftDate = dateInput.value;
+    if (!shiftDate) {
+      dateError.style.display = "block";
+      dateInput.focus();
+      return;
+    }
+    dateError.style.display = "none";
+
     const values = {};
     FIELDS.forEach(f => {
       values[f.key] = parseInt(document.getElementById(f.key).value, 10) || 0;
@@ -500,6 +533,7 @@
 
     pendingReport = {
       name,
+      shiftDate,
       timestamp: new Date().toISOString(),
       values
     };
@@ -508,7 +542,7 @@
   });
 
   function openReviewModal(report){
-    reviewName.textContent = report.name;
+    reviewName.textContent = `${report.name} · ${formatDateDisplay(report.shiftDate)}`;
     reviewTable.innerHTML = "";
     FIELDS.forEach(f => {
       const tr = document.createElement("tr");
@@ -527,7 +561,8 @@
     if (!pendingReport) return;
     modalSubmitError.style.display = "none";
     confirmSubmitBtn.disabled = true;
-    confirmSubmitBtn.textContent = "Submitting...";
+    submitSpinner.style.display = "inline-block";
+    submitBtnText.textContent = "Submitting...";
 
     try {
       const resp = await fetch("/api/submit", {
@@ -542,9 +577,8 @@
       }
 
       saveToLocalHistory(pendingReport);
-      lastReport = pendingReport;
       reviewModal.style.display = "none";
-      renderConfirmation(pendingReport);
+      renderThankYou();
     } catch (err) {
       console.error(err);
       saveToLocalHistory(pendingReport);
@@ -552,44 +586,22 @@
       modalSubmitError.style.display = "block";
     } finally {
       confirmSubmitBtn.disabled = false;
-      confirmSubmitBtn.textContent = "Submit";
+      submitSpinner.style.display = "none";
+      submitBtnText.textContent = "Submit";
     }
   });
 
-  function renderConfirmation(report){
+  function renderThankYou(){
     form.style.display = "none";
     confirmPanel.style.display = "block";
-    confirmSub.textContent = `${report.name} · ${todayStamp()}`;
-
-    summaryTable.innerHTML = "";
-    FIELDS.forEach(f => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${f.label}</td><td>${report.values[f.key]}</td>`;
-      summaryTable.appendChild(tr);
-    });
   }
-
-  document.getElementById("copyBtn").addEventListener("click", () => {
-    if (!lastReport) return;
-    const lines = [
-      `Aloha Maids — End of Shift Report`,
-      `Name: ${lastReport.name}`,
-      `Date: ${todayStamp()}`,
-      ...FIELDS.map(f => `${f.label}: ${lastReport.values[f.key]}`)
-    ];
-    const text = lines.join("\n");
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = document.getElementById("copyBtn");
-      const original = btn.textContent;
-      btn.textContent = "Copied!";
-      setTimeout(() => btn.textContent = original, 1500);
-    });
-  });
 
   document.getElementById("newReportBtn").addEventListener("click", () => {
     form.reset();
     FIELDS.forEach(f => document.getElementById(f.key).value = 0);
+    dateInput.value = todayISODate();
     nameError.style.display = "none";
+    dateError.style.display = "none";
     pendingReport = null;
     confirmPanel.style.display = "none";
     form.style.display = "block";

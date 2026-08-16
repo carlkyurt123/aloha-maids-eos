@@ -4,10 +4,12 @@ const FIELD_ORDER = [
   'receivedCalls',
   'outboundCalls',
   'bookingByStaff',
+  'bookingOnline',
+  'bookingByCustomer',
   'emailQuoteSent',
   'marketingRobo',
   'textBrigade',
-  'grabbit',
+  'quoteFormLead',
   'newRecurring',
 ];
 
@@ -17,10 +19,15 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const { name, values, timestamp } = req.body || {};
+  const { name, shiftDate, values, timestamp } = req.body || {};
 
   if (!name || typeof name !== 'string' || !name.trim()) {
     res.status(400).json({ error: 'Name is required' });
+    return;
+  }
+
+  if (!shiftDate || typeof shiftDate !== 'string' || !shiftDate.trim()) {
+    res.status(400).json({ error: 'Shift date is required' });
     return;
   }
 
@@ -35,13 +42,14 @@ module.exports = async (req, res) => {
 
     const row = [
       new Date(timestamp || Date.now()).toLocaleString('en-US', { timeZone: 'Pacific/Honolulu' }),
+      shiftDate.trim(),
       name.trim(),
       ...FIELD_ORDER.map((key) => Number(values && values[key]) || 0),
     ];
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: 'EOS Reports!A:J',
+      range: 'EOS Reports!A:M',
       valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
       requestBody: { values: [row] },

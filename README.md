@@ -30,11 +30,11 @@ There's no build step — Vercel serves `index.html` as a static file and runs
 
 1. Create a new Google Sheet (or use an existing one).
 2. Rename the first tab to **`EOS Reports`** (must match exactly — the function writes to
-   the range `EOS Reports!A:J`).
+   the range `EOS Reports!A:M`).
 3. Add a header row:
 
    ```
-   Timestamp | Name | Received Calls | Outbound Calls | Booking by Staff | Email Quote Sent | Marketing/Robo | Text Brigade | Grabbit | New Recurring
+   Timestamp | Shift Date | Name | Received Calls | Outbound Calls | Booking by Staff | Booking Online | Booking by Customer | Email Quote Sent | Marketing/Robo | Text Brigade | Quote Form Lead | New Recurring
    ```
 
 4. Copy the **Sheet ID** out of the URL — the long string between `/d/` and `/edit`:
@@ -134,9 +134,9 @@ using the `.env` file for credentials.
 ## How it works
 
 1. Sales rep fills out the form and hits **Submit my EOS Report**.
-2. The browser POSTs `{ name, timestamp, values }` to `/api/submit`.
+2. The browser POSTs `{ name, shiftDate, timestamp, values }` to `/api/submit`.
 3. The function authenticates as the service account and appends one row to
-   `EOS Reports!A:J` in the target sheet.
-4. On success, the page shows a confirmation summary. On failure (network issue, bad
-   credentials, etc.), the report is still cached in that browser's `localStorage` and
-   the rep sees a message to flag it to their manager.
+   `EOS Reports!A:M` in the target sheet.
+4. On success, the page shows a loading spinner then a "Mahalo" thank-you screen. On
+   failure (network issue, bad credentials, etc.), the report is still cached in that
+   browser's `localStorage` and the rep sees a message to flag it to their manager.
