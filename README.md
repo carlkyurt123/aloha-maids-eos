@@ -37,6 +37,12 @@ There's no build step — Vercel serves `index.html` as a static file and runs
    Timestamp | Shift Date | Name | Received Calls | Outbound Calls | Booking by Staff | Booking Online | Booking by Customer | Email Quote Sent | Marketing/Robo | Text Brigade | Quote Form Lead | New Recurring
    ```
 
+   **Booking by Customer** (column H) is retired — the form no longer collects it.
+   The column and its header stay so existing rows keep their alignment, and new
+   rows leave the cell blank rather than writing a `0` that would look like a real
+   count. Don't delete the column unless you also narrow the range in
+   `api/submit.js` from `A:M` to `A:L`.
+
 4. Copy the **Sheet ID** out of the URL — the long string between `/d/` and `/edit`:
 
    ```

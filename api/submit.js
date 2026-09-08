@@ -13,6 +13,11 @@ const FIELD_ORDER = [
   'newRecurring',
 ];
 
+// Fields the form no longer collects. Their columns stay in place so historical
+// rows keep their alignment, but new rows leave them blank rather than writing a
+// 0 that would read as a real count.
+const RETIRED_FIELDS = new Set(['bookingByCustomer']);
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
@@ -44,7 +49,7 @@ module.exports = async (req, res) => {
       new Date(timestamp || Date.now()).toLocaleString('en-US', { timeZone: 'Pacific/Honolulu' }),
       shiftDate.trim(),
       name.trim(),
-      ...FIELD_ORDER.map((key) => Number(values && values[key]) || 0),
+      ...FIELD_ORDER.map((key) => (RETIRED_FIELDS.has(key) ? '' : Number(values && values[key]) || 0)),
     ];
 
     await sheets.spreadsheets.values.append({
